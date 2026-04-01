@@ -1,4 +1,3 @@
-# *uavRpheno*: High-Throughput Phenotyping Utilities for Agronomic Trials
 
 ## 1. What is uavRpheno?
 
@@ -134,7 +133,7 @@ plot026 <- plot_htp(
 
 ---
 
-## 6. Phenological Feature Extraction
+## 4. Phenological Feature Extraction
 
 ### `extract_htp_pheno()`
 
@@ -225,7 +224,7 @@ fig / Boxplot_F11.png
 
 # Statistical Modeling
 
-## 8. Trait Dataset
+## 5. Trait Dataset
 
 Agronomic traits can be loaded from an external spreadsheet that contains experimental observations per genotype and block.
 
@@ -235,7 +234,7 @@ traits <-  data("traits_trigo")
 
 ---
 
-## 9. Correlation Analysis
+## 6. Correlation Analysis
 
 ### `htp_correlations()`
 
@@ -252,7 +251,7 @@ cor_table <- htp_correlations(traits = traits_trigo,
 
 ---
 
-## 10. ANOVA
+## 7. ANOVA
 
 ### `run_glmer_anova()`
 
@@ -271,7 +270,7 @@ anova_results <- run_glmer_anova(traits = traits_trigo,
 
 ---
 
-## 11. Regression Modeling
+## 8. Regression Modeling
 
 ### `ht_regression()`
 
