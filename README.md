@@ -30,8 +30,8 @@ Despite the growing availability of remote sensing data, there are still relativ
 ## Installation
 
 The **uavRpheno** package must be installed from the GitHub repository: 
-*Step 1*:  Install `remotes` from CRAN. 
-*Step 2*: In Rstudio console or on your script, please write
+*Step 1*:  Install `remotes` from CRAN.   
+*Step 2*: In Rstudio console or on your script, please write  
 ```r
   `remotes::install_github("kundun14/uavRpheno")`.
 ```
