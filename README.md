@@ -1,8 +1,8 @@
-# *htp_utils*: High-Throughput Phenotyping Utilities for Agronomic Trials
+# *uavRpheno*: High-Throughput Phenotyping Utilities for Agronomic Trials
 
-## 1. What is htp_utils?
+## 1. What is uavRpheno?
 
-`htp_utils` is a collection of R scripts designed to perform common high-throughput phenotyping tasks using time series of multispectral imagery in the context of agronomic experimental trials. The toolkit enables the fast and simple derivation of vegetation indices and structural canopy variables from UAV imagery.
+`uavRpheno` is a R library designed to perform common high-throughput phenotyping tasks using time series of multispectral imagery in the context of agronomic experimental trials. The toolkit enables the fast and simple derivation of vegetation indices and structural canopy variables from UAV imagery.
 
 The package focuses on extracting multispectral indicators such as canopy cover, canopy volume, excessive greenness index, and normalized difference vegetation index. In addition, it provides tools for modeling crop phenology using spline-based growth curves and for conducting statistical analysis through regression and generalized linear mixed models. Several plotting utilities are also included to visualize spatial variables, phenological curves, and statistical relationships.
 
@@ -12,8 +12,8 @@ The package focuses on extracting multispectral indicators such as canopy cover,
 <!-- ![Geospatial Products Batch 1](figs/htp_utils_flow.png) -->
 
 <p align="center">
-<img src="figs/htp_utils_flow.png" width="900"><br>
-<b>Figure 1.</b> Workflow of the <code>htp_utils</code> processing pipeline.
+<img src="flowchart.png" width="900"><br>
+<b>Figure 1.</b> Workflow of the <code>uavRpheno</code> processing pipeline.
 </p>
 
 
@@ -28,6 +28,19 @@ Because high-throughput phenotyping is often applied in agricultural experimenta
 Despite the growing availability of remote sensing data, there are still relatively few simple workflows that allow researchers to easily derive phenotypic parameters from multispectral imagery and integrate them with agronomic traits such as yield or productivity indicators. The `htp_utils` toolkit aims to provide a practical workflow for extracting phenotypic variables, modeling crop growth, and linking these features with traits of agronomic interest.
 
 ---
+## Installation
+
+The **uavRpheno** package must be installed from the GitHub repository: 
+*Step 1*:  Install `remotes` from CRAN. 
+*Step 2*: In Rstudio console or on your script, please write
+```r
+  `remotes::install_github("kundun14/uavRpheno")`.
+```
+then
+```r
+  library(uavRpheno).
+```
+
 
 # Modeling Workflow
 
@@ -83,31 +96,32 @@ correspoding files in the local folder.
 
 ```r
 htp_zonal <- extract_htp_zonal(
-  multi_path   = "PROCESING/MULTI/",
-  dsm_path     = "PROCESING/DSM/",
-  border_path  = "PROCESING/BORDERS/",
-  dtm_file     = "PROCESING/DTM/dtm.tif",
-  save_rasters = TRUE,
-  output_path  = "PROCESING/STACKS_07_03_26V2/",
-  group_var    = "COD",
-  daps = c("62", "86", "93", "121", "128")
+  multi_path = 'PROCESING/multi/',
+  dsm_path = 'PROCESING/dsm/',
+  border_path = 'PROCESING/borders/trail_trigo.gpkg',
+  dtm_file = 'PROCESING/dtm/dtm_14.tif',
+  save_rasters = FALSE,
+  treatment_var = "treatment",
+  blocking_var = "blocking",
+  daps = c("14", "35", "42", "56", "70","83","104","119","126","145"),
+  band_indices = c(B = 1, G = 2, R = 3, RE = 4, NIR = 5, T = 6)
 )
 ```
 
 ---
 
-The geospatial products genereted can be ploted  across the full or partial crop growth period. The example below generates plots for genotype **CQC-026** and block **B1** for several observation dates expressed as days after planting (DAP).
+<!-- The geospatial products genereted can be ploted  across the full or partial crop growth period. The example below generates plots for genotype **CQC-026** and block **B1** for several observation dates expressed as days after planting (DAP). -->
 
-```r
+<!-- ```r
 plot026 <- plot_htp(
   target_cod  = "CQC-026",
   target_bloq = "B1",
   daps        = c("62", "86", "93", "121", "128"),
   plot_path   = "PROCESING/PLOTS/GEOPRODUCTS"
 )
-```
+``` -->
 
-Here we show the canopy indicators for block **B1, B2** and **B3** of genotype **CQC-026**
+<!-- Here we show the canopy indicators for block **B1, B2** and **B3** of genotype **CQC-026**
 
 <table align="center">
 <tr>
@@ -115,7 +129,7 @@ Here we show the canopy indicators for block **B1, B2** and **B3** of genotype *
 <td><img src="figs/geoProducst_B2.png" width="100%"></td>
 <td><img src="figs/geoProducst_B3.png" width="100%"></td>
 </tr>
-</table>
+</table> -->
 
 
 ---
@@ -159,22 +173,18 @@ The full list of features are shox in the following table:
 
 
 ```r
-subGeno <- "CQC-026"
+# subGeno <- "CQC-026"
 
-htp_pheno <- extract_htp_pheno(
-  df         = htp_zonal,
-  group_var  = "COD",
-  bloq_var   = "BLOQ",
-  time_var   = "DAP",
-  plot       = TRUE,
-  genotypes  = subGeno,
-  plot_path  = "PROCESING/PLOTS/SUBSET/"
+htp_features <- extract_htp_pheno(
+  data = test_zonal,
+  indices = c("CC", "CV", "ExG", "NDVI"),
+  time_var = "DAP"
 )
 ```
 
 The function also returns fitting quality metrics such as **R²** and **RMSE** for each block of the experimental design.
 
-```r
+<!-- ```r
 htp_features <- htp_pheno$features
 htp_fitting_metrics <- htp_pheno$quality
 ```
@@ -183,11 +193,11 @@ We can plot the fitted functions for each genotype and each variable, here we sh
 for NDVI and Canopy Cover for **CQC-026**.
 
 ![Geospatial Products Batch 1](figs/Grid_Fit_NDVI_subset.png)
-![Geospatial Products Batch 1](figs/Grid_Fit_CC_subset.png)
+![Geospatial Products Batch 1](figs/Grid_Fit_CC_subset.png) -->
 
 ---
 
-## 7. Boxplots of Phenotypic Traits
+<!-- ## 7. Boxplots of Phenotypic Traits
 
 Boxplots can be generated to visualize the distribution of specific phenotypic features across selected genotypes.
 
@@ -201,7 +211,7 @@ boxplot(
   save_plot   = TRUE,
   plot_path   = "PROCESING/PLOTS/BOXPLOTS/"
 )
-```
+``` -->
 
 <!-- ```
 fig / Boxplot_F3.png
@@ -220,10 +230,7 @@ fig / Boxplot_F11.png
 Agronomic traits can be loaded from an external spreadsheet that contains experimental observations per genotype and block.
 
 ```r
-traits <- read.xlsx(
-  "MODELING_MATRIX_BLOQ.xlsx",
-  sheet = "MODELING_MATRIX_BLOQ"
-)
+traits <-  data("traits_trigo")
 ```
 
 ---
@@ -237,11 +244,10 @@ This function generates correlation tables between the extracted phenological fe
 Example:
 
 ```r
-cor_table <- htp_correlations(
-  df = traits,
-  htp_features = htp_features,
-  trait = "PMSEM"
-)
+cor_table <- htp_correlations(traits = traits_trigo,
+                              htp_features = htp_features,
+                              trait = "yield_kg_plot")
+
 ```
 
 ---
@@ -257,13 +263,10 @@ Agronomic trials typically follow a randomized complete block design (RCBD). In 
 Example:
 
 ```r
-anova_results <- run_glmer_anova(
-  traits,
-  htp_features,
-  "PMSEM",
-  "COD",
-  "BLOQ"
-)
+anova_results <- run_glmer_anova(traits = traits_trigo,
+                                 htp_features = htp_features,
+                                 trait = 'yield_kg_plot')
+
 ```
 
 ---
@@ -279,25 +282,28 @@ The first strategy applies forward feature selection, starting from a null model
 Example:
 
 ```r
-reg_results <- ht_regression(
-  traits,
-  htp_features,
-  trait = "PMSEM"
-)
+reg_results <- htp_regression(traits = traits_trigo,
+                              htp_features = htp_features,
+                              trait = "yield_kg_plot")
 ```
 
-Model comparisons and diagnostic plots can be generated with:
+Model comparisons and diagnostic plots can be generated with: 
 
 ```r
 plot_comparison_grid(
   reg_results,
   plot_path = "PROCESING/PLOTS/REGRES/"
 )
-```
+``` 
 
-Generated figures:
+<!-- # Generated figures:
 
-<!-- ```
-fig / regresion_plots.png
-``` -->
-![Geospatial Products Batch 1](figs/regresion_plots.png)
+# <!-- ```
+# fig / regresion_plots.png
+# ``` -->
+<!-- # ![Geospatial Products Batch 1](regresion_plots.png) --> -->
+
+<p align="center">
+<img src="regresion_plots.png" width="900"><br>
+<b>Figure 1.</b> Results regression of yield vs phenological features derived with uavRpheno.
+</p>
