@@ -1,0 +1,8 @@
+.Rproj.user
+.setup.R
+.traits_trigo.csv
+.test_zonal.csv
+*.tif
+*.zip
+PROCESING/
+tests/

@@ -1,0 +1,42 @@
+Package: uavRpheno
+Title: High-Throughput Phenotyping for Agronomic Trials using multispectral UAV images
+Version: 0.0.0.9000
+Authors@R: 
+    person("Marcelo", "Bueno", , "marcelobueno630@gmail.com", role = c("aut", "cre"))
+Description: Performs common high-throughput phenotyping (HTP) tasks using time series of multispectral imagery in the context of agronomic experimental trials, especially in randomized complete block designs (RCBD). The library enables derivation of canopy cover, canopy volume and vegetation indices, modeling of crop phenology using gaussian-based growth curves, and statistical modeling of derived features and field traits.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: 
+    broom.mixed (>= 0.2.9.6),
+    car (>= 3.1.3),
+    DHARMa (>= 0.4.7),
+    dplyr (>= 1.1.0),
+    emmeans (>= 1.10.7),
+    exactextractr (>= 0.10.0),
+    ggplot2 (>= 3.5.1),
+    gslnls (>= 1.4.1),
+    lme4 (>= 1.1.36),
+    lubridate (>= 1.9.4),
+    mgcv (>= 1.9.1),
+    minpack.lm (>= 1.2.4),
+    multcomp (>= 1.4.28),
+    multcompView (>= 0.1.10),
+    MuMIn (>= 1.48.4),
+    openxlsx (>= 4.2.8),
+    purrr (>= 1.0.0),
+    readr (>= 2.1.0),
+    sf (>= 1.0.19),
+    signal (>= 1.8.1),
+    skimr (>= 2.2.2),
+    stringr (>= 1.5.1),
+    terra (>= 1.8.21),
+    tidyr (>= 1.3.0),
+    zoo (>= 1.8.12)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Depends: 
+    R (>= 3.5)
+LazyData: true
