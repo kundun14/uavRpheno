@@ -27,19 +27,30 @@ Because high-throughput phenotyping is often applied in agricultural experimenta
 Despite the growing availability of remote sensing data, there are still relatively few simple workflows that allow researchers to easily derive phenotypic parameters from multispectral imagery and integrate them with agronomic traits such as yield or productivity indicators. The `htp_utils` toolkit aims to provide a practical workflow for extracting phenotypic variables, modeling crop growth, and linking these features with traits of agronomic interest.
 
 ---
-## Installation
+## 🛠 Installation
 
-The **uavRpheno** package must be installed from the GitHub repository: 
-*Step 1*:  Install `remotes` from CRAN.   
-*Step 2*: In Rstudio console or on your script, please write  
+The **uavRpheno** package is currently available via GitHub. Follow these steps to get it set up in your environment:
+
+### 1. Install Dependencies
+First, ensure you have the `remotes` package installed from CRAN:
+
 ```r
-  `remotes::install_github("kundun14/uavRpheno")`.
-```
-then
-```r
-  library(uavRpheno).
+install.packages("remotes")
 ```
 
+### 2. Install uavRpheno
+Run the following command to install the package directly from the repository:
+
+```r
+remotes::install_github("kundun14/uavRpheno")
+```
+
+### 3. Load the Library
+Once the installation is complete, load the package to start using its functions:
+
+```r
+library(uavRpheno)
+```
 
 # Modeling Workflow
 
