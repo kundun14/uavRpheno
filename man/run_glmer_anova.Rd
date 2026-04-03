@@ -5,13 +5,16 @@
 \title{Run Mixed-Effects ANOVA and Post-Hoc Tests}
 \usage{
 run_glmer_anova(
-  df,
-  htp_df,
-  response = "yield_kg_plot",
-  join_keys = c(treatment = "treatment", bloque = "blocking")
+  traits,
+  htp_features,
+  trait = "yield_kg_plot",
+  join_keys = c("treatment", "blocking")
 )
 }
 \arguments{
+\item{join_keys}{A named character vector for joining \code{df} and \code{htp_df}.
+Default is \code{c("treatment" = "treatment", "bloque" = "blocking")}.}
+
 \item{df}{A data frame containing ground-truth or phenotypic data.}
 
 \item{htp_df}{A data frame containing HTP-derived features (F-metrics) or
@@ -19,9 +22,6 @@ other predictors to be joined.}
 
 \item{response}{Character. The dependent variable to be analyzed
 (e.g., "yield_kg_plot" or an HTP feature like "F1").}
-
-\item{join_keys}{A named character vector for joining \code{df} and \code{htp_df}.
-Default is \code{c("treatment" = "treatment", "bloque" = "blocking")}.}
 }
 \value{
 A list containing:

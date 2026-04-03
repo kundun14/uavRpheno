@@ -5,15 +5,13 @@
 \title{Calculate Correlations Between HTP Features and Agronomic Traits}
 \usage{
 htp_correlations(
-  df,
+  traits,
   htp_features,
   trait = "yield_kg_plot",
-  join_keys = c(treatment = "treatment", bloque = "blocking")
+  join_keys = c("treatment", "blocking")
 )
 }
 \arguments{
-\item{df}{A data frame containing ground-truth agronomic data and joining keys.}
-
 \item{htp_features}{A data frame containing the extracted "F" features
 (F1, F2, etc.) and joining keys.}
 
@@ -22,6 +20,8 @@ against (e.g., "yield_kg_plot").}
 
 \item{join_keys}{A named character vector for joining \code{df} and
 \code{htp_features}. Default matches "treatment" and "blocking" columns.}
+
+\item{df}{A data frame containing ground-truth agronomic data and joining keys.}
 }
 \value{
 A data frame sorted by the absolute value of the correlation coefficient,

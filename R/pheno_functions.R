@@ -485,7 +485,6 @@ plot_htp <- function(output_path = "PROCESING/STACKS_07_03_26V2/",
 ###################### UTILS FITING
 
 
-
 rmse <- function(observed, predicted) {
   sqrt(mean((observed - predicted)^2, na.rm = TRUE))
 }
@@ -494,6 +493,7 @@ r2 <- function(observed, predicted) {
   1 - sum((observed - predicted)^2, na.rm = TRUE) /
     sum((observed - mean(observed, na.rm = TRUE))^2, na.rm = TRUE)
 }
+
 
 
 #' Extract High-Throughput Phenotyping (HTP) Metrics
@@ -516,13 +516,15 @@ r2 <- function(observed, predicted) {
 #' @param indices Character vector of column names to process. Defaults to CC, CV, ExG, and NDVI.
 #' @param group_cols Character vector of columns used to define unique experimental units (e.g., treatment and block).
 #' @param time_var Character string specifying the time variable (e.g., "DAP").
+#' @param k Integer specifying the basis dimension for the GAM spline. Defaults to 5.
 #'
 #' @return A data frame containing the original grouping columns and the calculated features F1 through F22.
 #' @export
 extract_htp_pheno <- function(data,
                               indices = c("CC", "CV", "ExG", "NDVI"),
                               group_cols = c("treatment", "blocking"),
-                              time_var = "DAP") {
+                              time_var = "DAP",
+                              k = 3) {
 
   groups <- unique(data[, group_cols])
   results_list <- list()
@@ -539,9 +541,9 @@ extract_htp_pheno <- function(data,
 
     for(idx in indices) {
       current_sub <- sub_data[!is.na(sub_data[[idx]]), ]
-      if(nrow(current_sub) < 5) next
+      if(nrow(current_sub) < (k + 1)) next
 
-      form <- as.formula(paste(idx, "~ s(", time_var, ", k = 5)"))
+      form <- as.formula(paste(idx, "~ s(", time_var, ", k =", k, ")"))
 
       model <- tryCatch({
         mgcv::gam(form, data = current_sub)
@@ -610,8 +612,87 @@ extract_htp_pheno <- function(data,
 
 
 
+#' Plot HTP Fitted Functions with Performance Metrics
+#'
+#' @description
+#' Visualizes the observed time-series data against fitted GAM splines for a
+#' specific vegetation index. Calculates and displays R2 and RMSE for each
+#' experimental unit within a faceted grid.
+#'
+#' @param data A data frame containing time-series vegetation indices.
+#' @param indices Character string specifying the column name to plot (e.g., "NDVI").
+#' @param treatment_var Character string for the column used as the row facet (e.g., "treatment").
+#' @param blocking_var Character string for the column used as the column facet (e.g., "blocking").
+#' @param time_var Character string specifying the time variable (e.g., "DAP").
+#' @param k Integer specifying the basis dimension for the GAM spline. Defaults to 3.
+#'
+#' @return A ggplot object showing observed points, fitted lines, and accuracy metrics.
+#' @export
+plot_htp_fit <- function(data,
+                         indices = "NDVI",
+                         treatment_var = "treatment",
+                         blocking_var = "blocking",
+                         time_var = "DAP",
+                         k = 3) {
 
+  rmse_func <- function(obs, pred) sqrt(mean((obs - pred)^2, na.rm = TRUE))
+  r2_func <- function(obs, pred) {
+    1 - sum((obs - pred)^2, na.rm = TRUE) /
+      sum((obs - mean(obs, na.rm = TRUE))^2, na.rm = TRUE)
+  }
 
+  data$plot_group <- paste(data[[treatment_var]], data[[blocking_var]], sep = "_")
+
+  all_preds <- list()
+  all_stats <- list()
+  groups <- unique(data$plot_group)
+
+  for(g in groups) {
+    sub_data <- data[data$plot_group == g & !is.na(data[[indices]]), ]
+    if(nrow(sub_data) < (k + 1)) next
+
+    form <- as.formula(paste(indices, "~ s(", time_var, ", k =", k, ")"))
+    model <- tryCatch(gam(form, data = sub_data), error = function(e) NULL)
+
+    if(!is.null(model)) {
+      t_seq <- seq(min(sub_data[[time_var]]), max(sub_data[[time_var]]), length.out = 100)
+      pred_line <- data.frame(time = t_seq)
+      colnames(pred_line) <- time_var
+      pred_line$fitted_val <- as.numeric(predict(model, newdata = pred_line))
+      pred_line$plot_group <- g
+      pred_line[[treatment_var]] <- sub_data[1, treatment_var]
+      pred_line[[blocking_var]] <- sub_data[1, blocking_var]
+
+      obs_pred <- as.numeric(predict(model, newdata = sub_data))
+      m_rmse <- rmse_func(sub_data[[indices]], obs_pred)
+      m_r2   <- r2_func(sub_data[[indices]], obs_pred)
+
+      stat_df <- data.frame(
+        treatment = sub_data[1, treatment_var],
+        blocking = sub_data[1, blocking_var],
+        label = paste0("R2: ", round(m_r2, 3), "\nRMSE: ", round(m_rmse, 4)),
+        stringsAsFactors = FALSE
+      )
+      colnames(stat_df)[1:2] <- c(treatment_var, blocking_var)
+
+      all_preds[[g]] <- pred_line
+      all_stats[[g]] <- stat_df
+    }
+  }
+
+  plot_data <- do.call(rbind, all_preds)
+  stats_data <- do.call(rbind, all_stats)
+
+  ggplot(data, aes_string(x = time_var, y = indices)) +
+    geom_point(color = "grey40", alpha = 0.8) +
+    geom_line(data = plot_data, aes(y = fitted_val), color = "blue", size = 0.8) +
+    geom_text(data = stats_data, aes(label = label),
+              x = -Inf, y = Inf, hjust = -0.1, vjust = 1.2,
+              size = 1.5, check_overlap = TRUE) +
+    facet_grid(as.formula(paste(treatment_var, "~", blocking_var))) +
+    labs(title = paste("Fit:", indices)) +
+    theme(plot.title = element_text(hjust = 0.5))
+}
 
 
 

@@ -1,4 +1,14 @@
 
+# *uavRpheno*: High-Throughput Phenotyping from UAV data
+
+
+<p align="center">
+<img src="g_abstract.jpg" width="900"><br>
+<b>Figure 1.</b> Canopy Cover (CV) zonal data fitted with GAM with <code>plot_htp_fit</code> function.
+</p>
+
+[![Project Status: Active -- The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)  [![License](https://img.shields.io/badge/license-GPL%20(%3E=%202)-lightgrey.svg?style=flat)](http://www.gnu.org/licenses/gpl-2.0.html)
+
 ## 1. What is uavRpheno?
 
 `uavRpheno` is a R library designed to perform common high-throughput phenotyping tasks using time series of multispectral imagery in the context of agronomic experimental trials. The toolkit enables the fast and simple derivation of vegetation indices and structural canopy variables from UAV imagery.
@@ -12,24 +22,25 @@ The package focuses on extracting multispectral indicators such as canopy cover,
 
 <p align="center">
 <img src="flowchart.png" width="900"><br>
-<b>Figure 1.</b> Workflow of the <code>uavRpheno</code> processing pipeline.
+<b>Figure 2.</b> Workflow of the <code>uavRpheno</code> processing pipeline.
 </p>
 
 
 ## 2. Problem Statement
 
-Phenotyping is the process of measuring and analyzing observable plant traits in order to understand their characteristics, performance, and genetic makeup (Bian et al., 2022). In modern agricultural research, remote sensing technologies such as UAV platforms and satellite imagery have become important tools for collecting phenotypic information at high spatial and temporal resolution (Feng et al., 2021; Rallo et al., 2020).
+Phenotyping is the process of measuring and analyzing observable plant traits in order to understand their characteristics, performance, and genetic makeup (Bian et al., 2022). In modern agricultural research, remote sensing technologies such as UAV platforms and satellite imagery have become important tools for collecting phenotypic information at high spatial and temporal resolution (Roth & Streit,2018).
 
-Typical phenotyping workflows consist of repeated multispectral UAV surveys during the crop growing season. From these observations, vegetation indices and canopy structural metrics can be derived to characterize plant health and development. By analyzing time-series observations of these variables, it becomes possible to model crop growth dynamics and extract phenological parameters.
+
+Typical phenotyping workflows consist of repeated multispectral UAV surveys during the crop growing season. From these observations, vegetation indices and canopy structural metrics can be derived to characterize plant health and development. By analyzing time-series observations of these variables, it becomes possible to model crop growth dynamics and extract phenological parameters (Borra-Serrano et al.,2020).
 
 Because high-throughput phenotyping is often applied in agricultural experimental trials, the unit of analysis should consider not only the genotype or variety under study but also the experimental block or replication structure of the design.
 
-Despite the growing availability of remote sensing data, there are still relatively few simple workflows that allow researchers to easily derive phenotypic parameters from multispectral imagery and integrate them with agronomic traits such as yield or productivity indicators. The `htp_utils` toolkit aims to provide a practical workflow for extracting phenotypic variables, modeling crop growth, and linking these features with traits of agronomic interest.
+Despite the growing availability of remote sensing data, there are still relatively few simple workflows that allow researchers to easily derive phenotypic parameters from multispectral imagery and integrate them with agronomic traits such as yield or productivity indicators. `uavRpheno` aims to provide a practical workflow for extracting phenotypic variables, modeling crop growth, and linking these features with traits of agronomic interest.
 
 ---
 ## 🛠 Installation
-
-The **uavRpheno** package is currently available via GitHub. Follow these steps to get it set up in your environment:
+ 
+Follow these steps to set up **uavRpheno**  in your environment:
 
 ### 1. Install Dependencies
 First, ensure you have the `remotes` package installed from CRAN:
@@ -46,7 +57,7 @@ remotes::install_github("kundun14/uavRpheno")
 ```
 
 ### 3. Load the Library
-Once the installation is complete, load the package to start using its functions:
+Once the installation is complete, load the package:
 
 ```r
 library(uavRpheno)
@@ -59,9 +70,9 @@ library(uavRpheno)
 ### `extract_htp_zonal()`
 
 This function processes multispectral reflectance data and digital surface models (DSM) for each flight time and produces a set of geospatial products to sucesive analysis. 
-Canopy cover (CC), canopy volume (CV), excessive greenness index (ExG), and normalized difference vegetation index (NDVI) can be generated from RGB and multispectral orthomosaic images together with digital surface models (DSM).
+Canopy cover (CC), canopy volume (CV), excessive greenness index (ExG), and normalized difference vegetation index (NDVI) can be generated from RGB and multispectral orthomosaic images together with digital surface models (DSM) (Chang et al, 2021).
 
-The following equations are used to derive canopy cover and vegetation indices from RGB and multispectral imagery.
+The following equations are used to derive canopy cover and vegetation indices from RGB and multispectral imagery (Patrignani et al.,2015).
 
 #### Canopy detection rule
 
@@ -148,7 +159,7 @@ plot026 <- plot_htp(
 
 ### `extract_htp_pheno()`
 
-This function allows to derive phenotypic features extracted from crop growth models derived from time-series UAV measurements fitted with spline functions.
+This function allows to derive phenotypic features extracted from the zonal statistics of the geospatial products fitted with generalized additive model (GAM) functions using [`mgcv`](https://cran.r-project.org/web/packages/mgcv/index.html) library.
 
 Maximum canopy cover and canopy volume values can be obtained. Growth-rate curves are then used to derive additional parameters such as maximum growth rate, the day after planting at which this maximum occurs, and the duration of the half-maximum growth period.
 
@@ -156,40 +167,41 @@ Additional phenological metrics are derived from ExG and NDVI fitted curves  cur
 
 The full list of features are shox in the following table:
 
-| Variable name | UAS product | Feature description |
-| :--- | :---: | :--- |
-| F1 | **CC** | Maximum value of CC |
-| F2 | | Maximum growth rate of CC |
-| F3 | | DAP at maximum growth rate of CC |
-| F4 | | Duration over the half maximum period of CC |
-| F5 | **CV** | Maximum value of CV |
-| F6 | | Maximum growth rate of CV |
-| F7 | | DAP at maximum growth rate of CV |
-| F8 | | Duration over the half maximum period of CV |
-| F9 | **ExG** | Maximum of ExG value |
-| F10 | | DAP at maximum of ExG value |
-| F11 | | Increasing slope of ExG |
-| F12 | | Maximum value of increasing line at maximum ExG DAP |
-| F13 | | Duration of increasing ExG period |
-| F14 | | Area of increasing period of ExG |
-| F15 | | Decreasing slope of ExG |
-| F16 | | Maximum value of decreasing line at maximum ExG DAP |
-| F17 | | Duration of decreasing ExG period |
-| F18 | | Area of decreasing period of ExG |
-| F19 | **NDVI** | Maximum NDVI value |
-| F20 | | DAP at maximum NDVI value |
-| F21 | | Increasing slope of NDVI |
-| F22 | | Decreasing slope of NDVI |
+| Features Name | Feature Description |
+| :--- | :--- |
+| F1 | Maximum value of CC |
+| F2 | Maximum growth rate of CC |
+| F3 | DAP at maximum growth rate of CC |
+| F4 | Duration over the half maximum period of CC |
+| F5 | Maximum value of CV |
+| F6 | Maximum growth rate of CV |
+| F7 | DAP at maximum growth rate of CV |
+| F8 | Duration over the half maximum period of CV |
+| F9 | Maximum of ExG value |
+| F10 | DAP at maximum of ExG value |
+| F11 | Increasing slope of ExG |
+| F12 | Maximum value of increasing line at maximum ExG DAP |
+| F13 | Duration of increasing ExG period |
+| F14 | Area of increasing period of ExG |
+| F15 | Decreasing slope of ExG |
+| F16 | Maximum value of decreasing line at maximum ExG DAP |
+| F17 | Duration of decreasing ExG period |
+| F18 | Area of decreasing period of ExG |
+| F19 | Maximum NDVI value |
+| F20 | DAP at maximum NDVI value |
+| F21 | Increasing slope of NDVI |
+| F22 | Decreasing slope of NDVI |
 
 
 ```r
-# subGeno <- "CQC-026"
 
 htp_features <- extract_htp_pheno(
   data = test_zonal,
   indices = c("CC", "CV", "ExG", "NDVI"),
-  time_var = "DAP"
+  time_var = "DAP",
+  k = 3
 )
+
 ```
 
 The function also returns fitting quality metrics such as **R²** and **RMSE** for each block of the experimental design.
@@ -197,13 +209,15 @@ The function also returns fitting quality metrics such as **R²** and **RMSE** f
 <!-- ```r
 htp_features <- htp_pheno$features
 htp_fitting_metrics <- htp_pheno$quality
-```
+``` -->
 
-We can plot the fitted functions for each genotype and each variable, here we show the fitte functions
-for NDVI and Canopy Cover for **CQC-026**.
+We can plot the fitted functions for each genotype and each variable with <code>plot_htp_fit</code> function, here we show the fitte functions for Canopy Cover (CV).
 
-![Geospatial Products Batch 1](figs/Grid_Fit_NDVI_subset.png)
-![Geospatial Products Batch 1](figs/Grid_Fit_CC_subset.png) -->
+<p align="center">
+<img src="fittedCV.png" width="900"><br>
+<b>Figure 3.</b> Canopy Cover (CV) zonal data fitted with GAM with <code>plot_htp_fit</code> function.
+</p>
+
 
 ---
 
@@ -221,7 +235,7 @@ boxplot(
   save_plot   = TRUE,
   plot_path   = "PROCESING/PLOTS/BOXPLOTS/"
 )
-``` -->
+```
 
 <!-- ```
 fig / Boxplot_F3.png
@@ -237,7 +251,7 @@ fig / Boxplot_F11.png
 
 ## 5. Trait Dataset
 
-Agronomic traits can be loaded from an external spreadsheet that contains experimental observations per genotype and block.
+Users can import agronomic traits from an external spreadsheet structured by genotype and block. For demonstration, the library provides a sample dataset from a wheat yield experiment in Peru.
 
 ```r
 traits <-  data("traits_trigo")
@@ -266,7 +280,7 @@ cor_table <- htp_correlations(traits = traits_trigo,
 
 ### `run_glmer_anova()`
 
-Genetic differences among genotypes can be evaluated using analysis of variance based on generalized linear mixed models.
+Genetic differences among genotypes can be evaluated using analysis of variance based on generalized linear mixed models via the <code>lme4::lmer </code> function of [`lme4`](https://cran.r-project.org/web/packages/lme4/index.html) library .
 
 Agronomic trials typically follow a randomized complete block design (RCBD). In this framework, the blocks are treated as random effects within a generalized linear mixed model with Gaussian error distribution and identity link function.
 
@@ -311,9 +325,22 @@ plot_comparison_grid(
 # <!-- ```
 # fig / regresion_plots.png
 # ``` -->
-<!-- # ![Geospatial Products Batch 1](regresion_plots.png) --> -->
+<!-- # ![Geospatial Products Batch 1](regresion_plots.png) --> 
 
 <p align="center">
 <img src="regresion_plots.png" width="900"><br>
-<b>Figure 1.</b> Results regression of yield vs phenological features derived with uavRpheno.
+<b>Figure 4.</b> Results regression of yield vs phenological features derived with uavRpheno.
 </p>
+
+
+## Current status
+
+Ploting functions are currently under deveploment. 
+
+## References
+
+* **Bian, C., Shi, H., Wu, S., Zhang, K., Wei, M., Zhao, Y., ... & Chen, S. (2022).** Prediction of Field-Scale Wheat Yield Using Machine Learning Method and Multi-Spectral UAV Data. *Remote Sensing*, 14(6), 1474. https://doi.org/10.3390/rs14061474
+* **Borra-Serrano, I., De Swaef, T., Quataert, P., Aper, J., Saleem, A., Saeys, W., ... & Lootens, P. (2020).** Closing the Phenotyping Gap: High Resolution UAV Time Series for Soybean Growth Analysis Provides Objective Data from Field Trials. *Remote Sensing*, 12(10), 1644. https://doi.org/10.3390/rs12101644
+* **Chang, A., Jung, J., Yeom, J., Maeda, M. M., Landivar, J. A., Enciso, J. M., ... & Anciso, J. R. (2021).** Unmanned Aircraft System-(UAS-) Based High-Throughput Phenotyping (HTP) for Tomato Yield Estimation. *Journal of Sensors*, 2021(1), 8875606. https://doi.org/10.1155/2021/8875606
+* **Patrignani, A., & Ochsner, T. E. (2015).** Canopeo: A Powerful New Tool for Measuring Fractional Green Canopy Cover. *Agronomy Journal*, 107(6), 2312-2320. https://doi.org/10.2134/agronj15.0150
+* **Roth, L., & Streit, B. (2018).** Predicting Cover Crop Biomass by Lightweight UAS-Based RGB and NIR Photography: An Applied Photogrammetric Approach. *Precision Agriculture*, 19(1), 93-114. https://doi.org/10.1007/s11119-017-9501-1

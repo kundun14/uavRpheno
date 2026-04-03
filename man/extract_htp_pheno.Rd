@@ -8,7 +8,8 @@ extract_htp_pheno(
   data,
   indices = c("CC", "CV", "ExG", "NDVI"),
   group_cols = c("treatment", "blocking"),
-  time_var = "DAP"
+  time_var = "DAP",
+  k = 3
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ extract_htp_pheno(
 \item{group_cols}{Character vector of columns used to define unique experimental units (e.g., treatment and block).}
 
 \item{time_var}{Character string specifying the time variable (e.g., "DAP").}
+
+\item{k}{Integer specifying the basis dimension for the GAM spline. Defaults to 5.}
 }
 \value{
 A data frame containing the original grouping columns and the calculated features F1 through F22.

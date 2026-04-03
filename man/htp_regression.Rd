@@ -7,18 +7,14 @@ using extracted HTP features. It handles data cleaning, scaling, and compares
 a Full Model against Forward and Backward stepwise selection models.}
 \usage{
 htp_regression(
-  df,
-  htp_df,
-  trait = "PMSEM",
+  traits,
+  htp_features,
+  trait = "yield_kg_plot",
   na_threshold = 0.3,
-  join_keys = c(treatment = "treatment", bloque = "blocking")
+  join_keys = c("treatment", "blocking")
 )
 }
 \arguments{
-\item{df}{A data frame containing ground-truth agronomic data.}
-
-\item{htp_df}{A data frame containing HTP-derived features (F-metrics).}
-
 \item{trait}{Character. The target response variable (e.g., "PMSEM").
 Note: The function applies a log10(x + 1e-6) transformation to this variable.}
 
@@ -26,6 +22,10 @@ Note: The function applies a log10(x + 1e-6) transformation to this variable.}
 allowed for a feature to be included in the model. Default is 0.3.}
 
 \item{join_keys}{A named character vector for joining \code{df} and \code{htp_df}.}
+
+\item{df}{A data frame containing ground-truth agronomic data.}
+
+\item{htp_df}{A data frame containing HTP-derived features (F-metrics).}
 }
 \value{
 A list containing:
