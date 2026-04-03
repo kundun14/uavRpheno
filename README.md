@@ -306,10 +306,6 @@ plot_comparison_grid(
 </p>
 
 
-## Current status
-
-Ploting functions are currently under deveploment. 
-
 ## References
 
 * **Bian, C., Shi, H., Wu, S., Zhang, K., Wei, M., Zhao, Y., ... & Chen, S. (2022).** Prediction of Field-Scale Wheat Yield Using Machine Learning Method and Multi-Spectral UAV Data. *Remote Sensing*, 14(6), 1474. https://doi.org/10.3390/rs14061474
