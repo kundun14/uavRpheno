@@ -387,39 +387,30 @@ extract_htp_zonal <- function(multi_path       = NULL,
 
 ##### PLOT RASTERS
 
-#' Plot Multi-Temporal High-Throughput Phenotyping (HTP) Products
+#' Plot HTP Geospatial Products Grid
 #'
-#' This function generates a grid of plots for a specific experimental unit (plot),
-#' showing its progression across multiple Days After Planting (DAP). It displays
-#' RGB imagery alongside Canopy Cover, Canopy Volume, NDVI, and ExG indices.
+#' @description
+#' Generates a multi-panel grid visualization of RGB orthomosaics and phenotypic
+#' index rasters (CC, CV, NDVI, ExG) for a specific experimental plot across
+#' multiple time points (DAPs).
 #'
-#' @param output_path Character. Path to the directory containing processed index
-#'   rasters (e.g., CC, CV, NDVI, ExG folders).
-#' @param multi_path Character. Path to the directory containing original
-#'   multispectral/RGB files.
-#' @param target_cod Character. The unique identifier (\code{COD}) of the plot to visualize.
-#' @param target_bloq Character. The blocking identifier (\code{BLOQ}) of the plot.
-#' @param border_file Character. Path to the vector file (e.g., .gpkg) containing
-#'   plot boundaries.
-#' @param daps A character vector of Days After Planting to include in the time series.
-#' @param plot_path Character. Path where the final resulting image (.png) will be saved.
+#' @param output_path Path to the root directory containing processed index folders.
+#' @param multi_path Path to the directory containing multispectral/RGB TIFF files.
+#' @param treatment Character string identifying the treatment group to filter.
+#' @param blocking Numeric or character identifying the block/rep to filter.
+#' @param border_file Path to the geopackage (.gpkg) containing plot boundaries.
+#' @param daps Character vector of Days After Planting to include in the columns.
+#' @param plot_path Directory path where the final PNG image will be saved.
 #'
-#' @details
-#' The function crops all rasters to the extent of the selected plot and applies
-#' a mask. It uses \code{patchwork} to arrange the indices as rows and DAPs as columns,
-#' providing a clear visual overview of temporal vegetation dynamics.
-#'
-#' @return A \code{patchwork} ggplot object. The function also saves a PNG file
-#'   to the specified \code{plot_path}.
-#'
+#' @return A patchwork ggplot object containing the arranged raster visualizations.
 #' @export
-plot_htp <- function(output_path = "PROCESING/STACKS_07_03_26V2/",
-                     multi_path  = "PROCESING/MULTI/",
-                     target_cod  = "CQC-183",
-                     target_bloq = "B1",
-                     border_file = "PROCESING/BORDERS/BORDERS_DAP_62_bloq.gpkg",
-                     daps        = c("62", "86", "93", "121", "128"),
-                     plot_path = NULL) {
+plot_htp<- function(output_path = "OUTPUT/",
+                    multi_path  = "PROCESING/MULTI/",
+                    treatment   = "N50",
+                    blocking    = 1,
+                    border_file = "PROCESING/borders/trail_trigo.gpkg",
+                    daps        = c("14", "104", "126"),
+                    plot_path   = "OUTPUT/PLOTS/") {
 
   library(terra)
   library(sf)
@@ -427,40 +418,70 @@ plot_htp <- function(output_path = "PROCESING/STACKS_07_03_26V2/",
   library(tidyterra)
   library(dplyr)
   library(patchwork)
+  library(fs)
 
   boundaries <- st_read(border_file, quiet = TRUE)
-  plot_poly  <- boundaries %>% dplyr::filter(COD == target_cod, BLOQ == target_bloq)
 
+  plot_poly <- boundaries %>%
+    dplyr::filter(treatment == !!treatment, blocking == as.numeric(!!blocking))
+
+  if(nrow(plot_poly) == 0) stop("No plot found for specified treatment/blocking.")
+
+  v_poly <- vect(plot_poly)
   plot_list <- list()
-  row_names <- c("rgb", "cc", "cv", "ndvi", "exg")
+
+  band_indices <- c(B = 1, G = 2, R = 3, RE = 4, NIR = 5, T = 6)
+  rgb_idx <- c(band_indices["R"], band_indices["G"], band_indices["B"])
 
   for (dap in daps) {
-    rgb_path <- list.files(multi_path, pattern = paste0("DAP_", dap), full.names = TRUE)[1]
-    rgb_raw  <- rast(rgb_path)[[c("Red", "Green", "Blue")]]
-    rgb_crop <- crop(rgb_raw, ext(plot_poly)) %>% mask(plot_poly)
+
+    pattern <- paste0("_", dap, "\\.tif$")
+    rgb_file <- fs::dir_ls(multi_path, regexp = pattern)[1]
+
+    if (length(rgb_file) == 0 || is.na(rgb_file)) {
+      warning(paste("RGB file missing for DAP", dap))
+      next
+    }
+
+    rgb_raw  <- rast(rgb_file)[[rgb_idx]]
+    rgb_crop <- crop(rgb_raw, v_poly) %>% mask(v_poly)
     rgb_bright <- stretch(rgb_crop, minv=0, maxv=255, minq=0.02, maxq=0.98)
 
-    ndvi_r <- rast(file.path(output_path, "NDVI", paste0("NDVI_DAP_", dap, ".tif"))) %>% crop(ext(plot_poly)) %>% mask(plot_poly)
-    cc_r   <- rast(file.path(output_path, "CC",   paste0("CC_DAP_", dap, ".tif")))   %>% crop(ext(plot_poly)) %>% mask(plot_poly)
-    cv_r   <- rast(file.path(output_path, "CV",   paste0("CV_DAP_", dap, ".tif")))   %>% crop(ext(plot_poly)) %>% mask(plot_poly)
-    exg_r  <- rast(file.path(output_path, "ExG",  paste0("ExG_DAP_", dap, ".tif")))  %>% crop(ext(plot_poly)) %>% mask(plot_poly)
+    find_idx <- function(type, d) {
+      dir_path <- fs::path(output_path, type)
+      if(!dir.exists(dir_path)) return(NULL)
+      fs::dir_ls(dir_path, regexp = paste0("_", d, "\\.tif$"))[1]
+    }
 
-    p_rgb  <- ggplot() + geom_spatraster_rgb(data = rgb_bright) + theme_void() + labs(title = paste("dap", dap))
-    p_cc   <- ggplot() + geom_spatraster(data = cc_r)   + scale_fill_gradient(low="white", high="darkgreen", na.value=NA) + theme_void() + theme(legend.position="none")
-    p_cv   <- ggplot() + geom_spatraster(data = cv_r)   + scale_fill_viridis_c(option = "magma", na.value=NA) + theme_void() + theme(legend.position="none")
+    idx_files <- list(
+      NDVI = find_idx("NDVI", dap),
+      CC   = find_idx("CC", dap),
+      CV   = find_idx("CV", dap),
+      ExG  = find_idx("ExG", dap)
+    )
+
+    if (any(sapply(idx_files, is.null)) || any(sapply(idx_files, function(x) length(x) == 0 || is.na(x)))) {
+      warning(paste("One or more index TIFFs missing for DAP", dap))
+      next
+    }
+
+    ndvi_r <- rast(idx_files$NDVI) %>% crop(v_poly) %>% mask(v_poly)
+    cc_r   <- rast(idx_files$CC)   %>% crop(v_poly) %>% mask(v_poly)
+    cv_r   <- rast(idx_files$CV)   %>% crop(v_poly) %>% mask(v_poly)
+    exg_r  <- rast(idx_files$ExG)  %>% crop(v_poly) %>% mask(v_poly)
+
+    p_rgb  <- ggplot() + geom_spatraster_rgb(data = rgb_bright) + theme_void() + labs(title = paste("DAP", dap))
+    p_cc   <- ggplot() + geom_spatraster(data = cc_r) + scale_fill_gradient(low="white", high="darkgreen", na.value=NA) + theme_void() + theme(legend.position="none")
+    p_cv   <- ggplot() + geom_spatraster(data = cv_r) + scale_fill_viridis_c(option = "magma", na.value=NA) + theme_void() + theme(legend.position="none")
     p_ndvi <- ggplot() + geom_spatraster(data = ndvi_r) + scale_fill_gradientn(colors = rev(terrain.colors(10)), na.value=NA) + theme_void() + theme(legend.position="none")
-    p_exg  <- ggplot() + geom_spatraster(data = exg_r)  + scale_fill_gradient2(low="brown", mid="white", high="forestgreen", na.value=NA) + theme_void() + theme(legend.position="none")
+    p_exg  <- ggplot() + geom_spatraster(data = exg_r) + scale_fill_gradient2(low="brown", mid="white", high="forestgreen", na.value=NA) + theme_void() + theme(legend.position="none")
 
     if (dap == daps[1]) {
-      label_style <- theme(axis.title.y = element_text(angle=90, size=8, face="bold", vjust=1),
-                           display.axis.titles = TRUE)
-
-
-      p_rgb  <- p_rgb  + ylab("rgb")  + theme(axis.title.y = element_text(angle=90, size=14, face="bold", vjust=1))
-      p_cc   <- p_cc   + ylab("cc")   + theme(axis.title.y = element_text(angle=90, size=14, face="bold", vjust=1))
-      p_cv   <- p_cv   + ylab("cv")   + theme(axis.title.y = element_text(angle=90, size=14, face="bold", vjust=1))
-      p_ndvi <- p_ndvi + ylab("ndvi") + theme(axis.title.y = element_text(angle=90, size=14, face="bold", vjust=1))
-      p_exg  <- p_exg  + ylab("exg")  + theme(axis.title.y = element_text(angle=90, size=14, face="bold", vjust=1))
+      p_rgb  <- p_rgb  + ylab("RGB")  + theme(axis.title.y = element_text(angle=90, size=12))
+      p_cc   <- p_cc   + ylab("CC")   + theme(axis.title.y = element_text(angle=90, size=12))
+      p_cv   <- p_cv   + ylab("CV")   + theme(axis.title.y = element_text(angle=90, size=12))
+      p_ndvi <- p_ndvi + ylab("NDVI") + theme(axis.title.y = element_text(angle=90, size=12))
+      p_exg  <- p_exg  + ylab("ExG")  + theme(axis.title.y = element_text(angle=90, size=12))
     }
 
     plot_list[[paste0(dap, "_1")]] <- p_rgb
@@ -470,12 +491,17 @@ plot_htp <- function(output_path = "PROCESING/STACKS_07_03_26V2/",
     plot_list[[paste0(dap, "_5")]] <- p_exg
   }
 
-  final_plot <- wrap_plots(plot_list, ncol = length(daps), byrow = FALSE) +
-    plot_annotation(title = paste(target_cod, "-", target_bloq)) &
-    theme(plot.title = element_text(hjust = 0.5, size = 14)) #face = "bold"
+  if(length(plot_list) == 0) stop("No data found to plot.")
 
-  ggsave(file.path(plot_path, paste0("geoProducst_", target_bloq , ".png")),
-         plot = final_plot, width = 10, height = 12, limitsize = FALSE)
+  final_plot <- wrap_plots(plot_list, ncol = length(daps), byrow = FALSE) +
+    plot_annotation(title = paste(treatment, "-", blocking)) &
+    theme(plot.title = element_text(hjust = 0.5, size = 12))
+
+  if(!is.null(plot_path)){
+    dir.create(plot_path, recursive = TRUE, showWarnings = FALSE)
+    ggsave(file.path(plot_path, paste0("geoProducts_", treatment, "_", blocking , ".png")),
+           plot = final_plot, width = 10, height = 12, limitsize = FALSE)
+  }
 
   return(final_plot)
 }

@@ -7,4 +7,5 @@ test_zonal.csv
 *.tif
 *.zip
 PROCESING/
+OUTPUT/
 tests/

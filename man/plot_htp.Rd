@@ -2,47 +2,38 @@
 % Please edit documentation in R/pheno_functions.R
 \name{plot_htp}
 \alias{plot_htp}
-\title{Plot Multi-Temporal High-Throughput Phenotyping (HTP) Products}
+\title{Plot HTP Geospatial Products Grid}
 \usage{
 plot_htp(
-  output_path = "PROCESING/STACKS_07_03_26V2/",
+  output_path = "OUTPUT/",
   multi_path = "PROCESING/MULTI/",
-  target_cod = "CQC-183",
-  target_bloq = "B1",
-  border_file = "PROCESING/BORDERS/BORDERS_DAP_62_bloq.gpkg",
-  daps = c("62", "86", "93", "121", "128"),
-  plot_path = NULL
+  treatment = "N50",
+  blocking = 1,
+  border_file = "PROCESING/borders/trail_trigo.gpkg",
+  daps = c("14", "104", "126"),
+  plot_path = "OUTPUT/PLOTS/"
 )
 }
 \arguments{
-\item{output_path}{Character. Path to the directory containing processed index
-rasters (e.g., CC, CV, NDVI, ExG folders).}
+\item{output_path}{Path to the root directory containing processed index folders.}
 
-\item{multi_path}{Character. Path to the directory containing original
-multispectral/RGB files.}
+\item{multi_path}{Path to the directory containing multispectral/RGB TIFF files.}
 
-\item{target_cod}{Character. The unique identifier (\code{COD}) of the plot to visualize.}
+\item{treatment}{Character string identifying the treatment group to filter.}
 
-\item{target_bloq}{Character. The blocking identifier (\code{BLOQ}) of the plot.}
+\item{blocking}{Numeric or character identifying the block/rep to filter.}
 
-\item{border_file}{Character. Path to the vector file (e.g., .gpkg) containing
-plot boundaries.}
+\item{border_file}{Path to the geopackage (.gpkg) containing plot boundaries.}
 
-\item{daps}{A character vector of Days After Planting to include in the time series.}
+\item{daps}{Character vector of Days After Planting to include in the columns.}
 
-\item{plot_path}{Character. Path where the final resulting image (.png) will be saved.}
+\item{plot_path}{Directory path where the final PNG image will be saved.}
 }
 \value{
-A \code{patchwork} ggplot object. The function also saves a PNG file
-to the specified \code{plot_path}.
+A patchwork ggplot object containing the arranged raster visualizations.
 }
 \description{
-This function generates a grid of plots for a specific experimental unit (plot),
-showing its progression across multiple Days After Planting (DAP). It displays
-RGB imagery alongside Canopy Cover, Canopy Volume, NDVI, and ExG indices.
-}
-\details{
-The function crops all rasters to the extent of the selected plot and applies
-a mask. It uses \code{patchwork} to arrange the indices as rows and DAPs as columns,
-providing a clear visual overview of temporal vegetation dynamics.
+Generates a multi-panel grid visualization of RGB orthomosaics and phenotypic
+index rasters (CC, CV, NDVI, ExG) for a specific experimental plot across
+multiple time points (DAPs).
 }

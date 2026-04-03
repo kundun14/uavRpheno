@@ -131,26 +131,24 @@ htp_zonal <- extract_htp_zonal(
 
 ---
 
-<!-- The geospatial products genereted can be ploted  across the full or partial crop growth period. The example below generates plots for genotype **CQC-026** and block **B1** for several observation dates expressed as days after planting (DAP). -->
+The geospatial products genereted can be ploted  across the full or partial crop growth period. The example below generates plots for treatment **N50** and block **1** for the first four observation dates (DAP).
 
-<!-- ```r
-plot026 <- plot_htp(
-  target_cod  = "CQC-026",
-  target_bloq = "B1",
-  daps        = c("62", "86", "93", "121", "128"),
-  plot_path   = "PROCESING/PLOTS/GEOPRODUCTS"
-)
-``` -->
+```r
+plot_htp(
+  output_path = "OUTPUT/",
+  multi_path = "PROCESING/multi/",
+  treatment = "N50",
+  blocking = "1",
+  border_file = 'PROCESING/borders/trail_trigo.gpkg',
+  daps =  c("14","35","42","56"),
+  plot_path = "OUTPUT/PLOTS/")
 
-<!-- Here we show the canopy indicators for block **B1, B2** and **B3** of genotype **CQC-026**
+```
 
-<table align="center">
-<tr>
-<td><img src="figs/geoProducst_B1.png" width="100%"></td>
-<td><img src="figs/geoProducst_B2.png" width="100%"></td>
-<td><img src="figs/geoProducst_B3.png" width="100%"></td>
-</tr>
-</table> -->
+<p align="center">
+<img src="geoProducts_N50_1.png" width="900"><br>
+<b>Figure 3.</b> RGB, CC, CV, NDVI and ExG image time series ploted by treatment and repetition. All masked by the green pixel detection formula.
+</p>
 
 
 ---
@@ -211,38 +209,13 @@ htp_features <- htp_pheno$features
 htp_fitting_metrics <- htp_pheno$quality
 ``` -->
 
-We can plot the fitted functions for each genotype and each variable with <code>plot_htp_fit</code> function, here we show the fitte functions for Canopy Cover (CV).
+We can plot the fitted functions for each genotype or treatment and each variable with <code>plot_htp_fit</code> function, here we show the fitte functions for Canopy Cover (CV).
 
 <p align="center">
 <img src="fittedCV.png" width="900"><br>
-<b>Figure 3.</b> Canopy Cover (CV) zonal data fitted with GAM with <code>plot_htp_fit</code> function.
+<b>Figure 4.</b> Canopy Cover (CV) zonal data fitted with GAM with <code>plot_htp_fit</code> function.
 </p>
 
-
----
-
-<!-- ## 7. Boxplots of Phenotypic Traits
-
-Boxplots can be generated to visualize the distribution of specific phenotypic features across selected genotypes.
-
-```r
-subGeno <- c("CQC-003", "CQC-026", "CQC-034", "CQC-051", "CQC-067")
-
-boxplot(
-  df_features = htp_features,
-  htp_feature = "F19",
-  genotypes   = subGeno,
-  save_plot   = TRUE,
-  plot_path   = "PROCESING/PLOTS/BOXPLOTS/"
-)
-```
-
-<!-- ```
-fig / Boxplot_F3.png
-fig / Boxplot_F11.png
-``` -->
-<!-- ![Geospatial Products Batch 1](figs/Boxplot_F3.png)
-![Geospatial Products Batch 1](figs/Boxplot_F11.png) -->
 
 
 ---
@@ -329,7 +302,7 @@ plot_comparison_grid(
 
 <p align="center">
 <img src="regresion_plots.png" width="900"><br>
-<b>Figure 4.</b> Results regression of yield vs phenological features derived with uavRpheno.
+<b>Figure 5.</b> Results regression of yield vs phenological features derived with uavRpheno.
 </p>
 
 
