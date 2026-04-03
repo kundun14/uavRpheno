@@ -3,7 +3,7 @@
 
 
 <p align="center">
-<img src="g_abstract.jpg" width="900"><br>
+<img src="g_abstract.png" width="900"><br>
 <b>Figure 1.</b> Canopy Cover (CV) zonal data fitted with GAM with <code>plot_htp_fit</code> function.
 </p>
 
@@ -13,7 +13,7 @@
 
 `uavRpheno` is a R library designed to perform common high-throughput phenotyping tasks using time series of multispectral imagery in the context of agronomic experimental trials. The toolkit enables the fast and simple derivation of vegetation indices and structural canopy variables from UAV imagery.
 
-The package focuses on extracting multispectral indicators such as canopy cover, canopy volume, excessive greenness index, and normalized difference vegetation index. In addition, it provides tools for modeling crop phenology using spline-based growth curves and for conducting statistical analysis through regression and generalized linear mixed models. Several plotting utilities are also included to visualize spatial variables, phenological curves, and statistical relationships.
+The package focuses on extracting multispectral indicators such as canopy cover, canopy volume, excessive greenness index, and normalized difference vegetation index. In addition, it provides tools for modeling crop phenology using GAM-based growth curves and for conducting statistical analysis through regression and generalized linear mixed models. Several plotting utilities are also included to visualize spatial variables, phenological curves, and statistical relationships.
 
 ---
 

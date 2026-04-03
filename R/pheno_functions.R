@@ -412,14 +412,6 @@ plot_htp<- function(output_path = "OUTPUT/",
                     daps        = c("14", "104", "126"),
                     plot_path   = "OUTPUT/PLOTS/") {
 
-  library(terra)
-  library(sf)
-  library(ggplot2)
-  library(tidyterra)
-  library(dplyr)
-  library(patchwork)
-  library(fs)
-
   boundaries <- st_read(border_file, quiet = TRUE)
 
   plot_poly <- boundaries %>%
