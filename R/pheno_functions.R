@@ -1,4 +1,64 @@
 
+
+#' Plot Trial Experimental Design and Trait Distribution
+#'
+#' @param border_file Character. Path to the .gpkg or spatial file containing plot boundaries.
+#' @param treatment Character. The column name in 'dt' representing the treatment levels.
+#' @param blocking Character. The column name in 'dt' representing the blocking variable.
+#' @param trait Character. The column name in 'dt' representing the response variable (e.g., yield).
+#' @param plot_path Character. The directory path where the resulting plot will be saved.
+#'
+#' @return A combined ggplot object (via patchwork) showing the spatial layout and a distribution plot.
+#' @export
+#'
+#' @examples
+#' plot_trial('data/border.gpkg', 'treatment', 'blocking', 'yield_kg_plot', 'output/plots/')
+plot_trial <- function(border_file, treatment, blocking, trait, plot_path) {
+
+    dt_sf <- st_as_sf(dt)
+
+    dt_sf[[treatment]] <- as.factor(dt_sf[[treatment]])
+    dt_sf[[blocking]] <- as.factor(dt_sf[[blocking]])
+
+    p1 <- ggplot(dt_sf) +
+      geom_sf(aes(fill = .data[[treatment]]), color = "white", linewidth = 0.3) +
+      geom_sf_text(aes(label = paste0(.data[[treatment]], "\nB:", .data[[blocking]])),
+                   size = 2.5, fontface = "bold") +
+      scale_fill_viridis_d(option = "viridis", name = "Treatment") +
+      labs(title = "Trial Layout",
+           subtitle = paste("Block Variable:", blocking),
+           x = "Easting", y = "Northing") +
+      theme_grey() +
+      theme(
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.position = "right"
+      )
+
+    p2 <- ggplot(dt_sf, aes(x = .data[[treatment]], y = .data[[trait]], color = .data[[treatment]])) +
+      geom_jitter(width = 0.15, size = 2, alpha = 0.7) +
+      stat_summary(fun = mean, geom = "point", shape = 18, size = 4, color = "black") +
+      scale_color_viridis_d(option = "viridis", guide = "none") +
+      labs(title = paste(trait, "by Treatment"),
+           subtitle = "Individual Plots & Group Means",
+           x = "Treatment", y = trait) +
+      theme_grey() +
+      theme(
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5)
+      )
+
+    combined_plot <- patchwork::wrap_plots(p1, p2, ncol = 2, widths = c(1.5, 1))
+
+    if (!dir.exists(plot_path)) dir.create(plot_path, recursive = TRUE)
+
+    file_name <- paste0(plot_path, "trial_", trait, "_analysis.png")
+    ggsave(file_name, combined_plot, width = 12, height = 6, dpi = 300)
+
+    return(combined_plot)
+  }
+
+
 #### MASK
 #' Calculate Canopy Coverage (CC) Pixel Map
 #'
