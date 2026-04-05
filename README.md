@@ -65,6 +65,25 @@ library(uavRpheno)
 
 # Modeling Workflow
 
+We can get a initial glance of the experimental layout and trait distribution under study by simple calling the <code>plot_trial</code> function:
+
+```r
+plot_trial(
+  border_file = 'PROCESING/borders/trail_trigo.gpkg',
+  treatment = "treatment",
+  blocking = "blocking",
+  trait = "yield_kg_plot",
+  plot_path = "OUTPUT/PLOTS/"
+)
+```
+
+<p align="center">
+<img src="trial_yield_kg_plot_analysis.png" width="900"><br>
+<b>Figure 3.</b> Resulting plot of the <code>plot_trial</code> function.
+</p>
+
+
+
 ## 3. Zonal Extraction of HTP Variables
 
 ### `extract_htp_zonal()`
@@ -147,7 +166,7 @@ plot_htp(
 
 <p align="center">
 <img src="geoProducts_N50_1.png" width="900"><br>
-<b>Figure 3.</b> RGB, CC, CV, NDVI and ExG image time series ploted by treatment and repetition. All masked by the green pixel detection formula.
+<b>Figure 4.</b> RGB, CC, CV, NDVI and ExG image time series ploted by treatment and repetition. All masked by the green pixel detection formula.
 </p>
 
 
@@ -213,7 +232,7 @@ We can plot the fitted functions for each genotype or treatment and each variabl
 
 <p align="center">
 <img src="fittedCV.png" width="900"><br>
-<b>Figure 4.</b> Canopy Cover (CV) zonal data fitted with GAM with <code>plot_htp_fit</code> function.
+<b>Figure 5.</b> Canopy Cover (CV) zonal data fitted with GAM with <code>plot_htp_fit</code> function.
 </p>
 
 
@@ -302,7 +321,7 @@ plot_comparison_grid(
 
 <p align="center">
 <img src="regresion_plots.png" width="900"><br>
-<b>Figure 5.</b> Results regression of yield vs phenological features derived with uavRpheno.
+<b>Figure 6.</b> Results regression of yield vs phenological features derived with uavRpheno.
 </p>
 
 
