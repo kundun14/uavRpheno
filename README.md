@@ -2,10 +2,10 @@
 # *uavRpheno*: High-Throughput Phenotyping from UAV data
 
 
-<p align="center">
+<!-- <p align="center">
 <img src="g_abstract.png" width="900"><br>
 <b>Figure 1.</b> Canopy Cover (CV) zonal data fitted with GAM with <code>plot_htp_fit</code> function.
-</p>
+</p> -->
 
 [![Project Status: Active -- The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)  [![License](https://img.shields.io/badge/license-GPL%20(%3E=%202)-lightgrey.svg?style=flat)](http://www.gnu.org/licenses/gpl-2.0.html)
 
